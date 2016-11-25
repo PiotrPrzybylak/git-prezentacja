@@ -1,0 +1,1579 @@
+Git
+ System kontroli wersji
+
+* Agenda
+
+
+.link #3 Wstęp
+.link #26 Podstawy
+.link #80 Gałęzie
+.link #132 Zdalne repozytorium
+.link #140 Narzędzia
+.link #161 Szczegóły git reset
+.link #183 Git i SVN
+
+
+* Wprowadzenie do kontroli wersji
+* Git
+.image images/avoid_conflicts_horizontal.jpg  _ 850
+
+* System lokalny
+.image images/01-introduction/images/local.png 550 _
+* System scentralizowany
+.image images/01-introduction/images/centralized.png 550 _
+* System rozproszony
+.image images/01-introduction/images/distributed.png 550 _
+
+* Historia systemu Git
+Powstał w 2005
+Oryginalnym autorem jest Linus Torvalds
+Zastapił komercyjny system BitKeeper przy rozwoju jądra Linuxa
+
+Założenia:
+
+- Szybkość
+- Prosta konstrukcja
+- Silne wsparcie dla nieliniowego rozwoju (tysięcy równoległych gałęzi)
+- Pełne rozproszenie
+- Wydajna obsługa dużych projektów, takich jak jądro Linuksa (szybkość i rozmiar danych)
+
+* Podstawy Git
+
+- Migawki, nie różnice
+- Niemal każda operacja jest lokalna
+- Git ma wbudowane mechanizmy spójności danych
+- Standardowo Git wyłącznie dodaje nowe dane
+- Trzy stany pliku
+
+* Podstawy
+Inne system przechowują dane w postaci zmian do podstawowej wersji każdego z plików.
+.image images/01-introduction/images/deltas.png _ 900
+* Podstawy
+Git przechowuje dane jako migawki projektu w okresie czasu.
+.image images/01-introduction/images/snapshots.png _ 900
+
+* Trzy stany pliku
+.image images/01-introduction/images/areas.png 550 _
+
+* Instalacja
+* Instalacja w systemie Linux
+Dla dystrybucji opartych o RPM (Fedora / Red Hat)
+
+  $ sudo yum install git-all
+
+Dla dystrybucji opartych na Debianie (Ubuntu / Mint)
+
+ $ sudo apt-get install git-all
+
+* Instalacja w systemie Windows
+Instalator na stronie:
+
+.link https://git-for-windows.github.io/ https://git-for-windows.github.io/
+
+* Instalacja w systemie Windows
+.image images/git-install/git_install_mintty.png
+
+* Instalacja w systemie Windows
+.image images/git-install/git_install_path.png
+* Instalacja w systemie Windows
+.image images/git-install/git_install_autocrlf.png
+* Instalacja w systemie Windows
+.image images/git-install/git_install_caching.png
+
+* Wstępna konfiguracja Git
+
+Narzędzie "git config" - pliki konfiguracyjne:
+
+- /etc/gitconfig (opcja --system)
+- ~/.gitconfig (opcja --global)
+- .git/config
+
+Każdy poziom ma priorytet wyższy niż poziom poprzedni, zatem wartości zmiennych z pliku .git/config przesłaniają wartości zmiennych z pliku /etc/gitconfig.
+
+W systemie Windows:
+
+- C:\ProgramData\Git\config (zmiany przy pomocy: git config -f <file> )
+- /etc/gitconfig (ścieżka względna w do katalogu instalacji MSysGit)
+- $HOME/.gitconfig
+- .git/config
+
+* Wstępna konfiguracja Git - nazwa użytkownika i adres e-mail
+
+ $ git config --global user.name "Jan Nowak"
+ $ git config --global user.email jannowak@example.com
+
+* Wstępna konfiguracja Git - domyślny edytor
+ $ git config --global core.editor emacs
+
+*  Wstępna konfiguracja Git - Sprawdzanie ustawień
+Wszystkie ustawienia:
+
+ $ git config --list
+
+Sprawdzenie pojedynczej wartości:
+
+ $ git config user.name
+
+*  Wstępna konfiguracja Git - Sprawdzanie ustawień
+ git config --list --show-origin
+.image images/git_config_files.png _ 800
+
+* Uzyskiwanie pomocy
+
+ $ git help <polecenie>
+ $ git <polecenie> --help
+ $ man git-<polecenie>
+
+Przykład:
+
+ $ git help config
+
+Internet:
+
+- kanał #git lub #github na serwerze IRC Freenode (irc.freenode.net)
+- https://git-scm.com/ (m.in. oficjalna dokumentacja i ksiażka Pro Git)
+- http://stackoverflow.com/
+
+* Podstawowe komendy
+
+* Tworzenie i pobieranie repozytorium
+
+Stwórz lokalne repozytorium:
+
+ $ git init
+
+Dodaj pliki i zatwierdź zmiany
+
+ $ git add *.c
+ $ git add LICENSE
+ $ git commit -m 'initial project version'
+
+Sklonuj zdalne repozytorium:
+
+ $ git clone https://github.com/libgit2/libgit2
+
+Sklonuj zdalne repozytorium podając nazwę katalogu docelowego:
+
+ $ git clone https://github.com/libgit2/libgit2 mylibgit
+
+* Rejestrowanie zmian w repozytorium
+
+.image images/02-git-basics/images/lifecycle.png _ 980
+
+* Sprawdzanie stanu swoich plików
+
+Przy świeżo sklonowanym repozytorium:
+
+ $ git status
+ On branch master
+ Your branch is up-to-date with 'origin/master'.
+ nothing to commit, working directory clean
+
+Dodajny plik!
+
+ $ echo 'My Project' > README
+ $ git status
+ On branch master
+ Your branch is up-to-date with 'origin/master'.
+ Untracked files:
+   (use "git add <file>..." to include in what will be committed)
+
+     README
+
+ nothing added to commit but untracked files present (use "git add" to track)
+
+* Śledzenie nowych plików
+
+ $ git add README
+
+Sprawdźmy efekt:
+
+ $ git status
+ On branch master
+ Your branch is up-to-date with 'origin/master'.
+ Changes to be committed:
+   (use "git reset HEAD <file>..." to unstage)
+
+     new file:   README
+
+* Modyfikowanie plików
+Załóżmy, że dokonaliśmy zmian w pliku CONTRIBUTING.md
+
+ $ git status
+ On branch master
+ Your branch is up-to-date with 'origin/master'.
+ Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+    new file:   README
+
+ Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+    modified:   CONTRIBUTING.md
+
+* Dodawanie zmodyfikowanych plików do poczekalni
+
+ $ git add CONTRIBUTING.md
+ $ git status
+ On branch master
+ Your branch is up-to-date with 'origin/master'.
+ Changes to be committed:
+   (use "git reset HEAD <file>..." to unstage)
+
+    new file:   README
+    modified:   CONTRIBUTING.md
+
+
+* Dodawanie zmodyfikowanych plików do poczekalni
+Wprawdźmy jeszcze jedną małą zmianę do pliku:
+
+ $ vim CONTRIBUTING.md
+ $ git status
+ On branch master
+ Your branch is up-to-date with 'origin/master'.
+ Changes to be committed:
+   (use "git reset HEAD <file>..." to unstage)
+
+     new file:   README
+     modified:   CONTRIBUTING.md
+
+ Changes not staged for commit:
+   (use "git add <file>..." to update what will be committed)
+   (use "git checkout -- <file>..." to discard changes in working directory)
+
+     modified:   CONTRIBUTING.md
+
+Jak to?! Plik widnieje teraz jednocześnie w poczekalni i poza nią. Jak to możliwe?
+
+* Dodawanie zmodyfikowanych plików do poczekalni
+- Git umieszcza plik w poczekalni dokładnie z taką zawartością, jak w momencie uruchomienia polecenia *git* *add*.
+- Jeśli w tej chwili zatwierdzisz zmiany, zostanie użyta wersja pliku dokładnie z momentu uruchomienia polecenia *git* *add*, nie zaś ta, którą widzisz w katalogu roboczym w momencie wydania polecenia *git* *commit*.
+- Po modyfikacji trzeba ponownie użyć *git* *add*:
+
+ $ git add CONTRIBUTING.md
+ $ git status
+ On branch master
+ Your branch is up-to-date with 'origin/master'.
+ Changes to be committed:
+   (use "git reset HEAD <file>..." to unstage)
+
+     new file:   README
+     modified:   CONTRIBUTING.md
+
+* Bardziej kompaktowy status
+Użycie opcji *-s* lub *--short* da nam uproszony opis stanu lokalnej kopii roboczej projektu
+
+ $ git status -s
+  M README
+ MM Rakefile
+ A  lib/git.rb
+ M  lib/simplegit.rb
+ ?? LICENSE.txt
+
+Lewa kolumna pokazuje stan w przechowalni, a prawa w kopii roboczej.
+
+* Ignorowanie plików
+
+ $ cat .gitignore
+ *.[oa]
+ *~
+
+- Puste linie lub linie rozpoczynające się od # są ignorowane.
+- Działają standardowe wyrażenia glob.
+- Możesz zacząć wyrażenie znakiem ukośnika (/) aby uniknąć rekurencji
+- Możesz zakończyć wyrażenie znakiem ukośnika (/) aby sprecyzować, że chodzi o katalog.
+- Możesz negować wyrażenia rozpoczynając je wykrzyknikiem (!).
+
+* Wyrażenia glob
+- Jak uproszczone wyrażenia regularne, używane przez powłokę.
+- Gwiazdka (*) dopasowuje zero lub więcej znaków;
+- [abc] dopasowuje dowolny znak znajdujący się wewnątrz nawiasu kwadratowego (w tym przypadku a, b lub c);
+- Znak zapytania (?) dopasowuje pojedynczy znak;
+- Nawias kwadratowy zawierający znaki rozdzielone myślnikiem ([0-9]) dopasowuje dowolny znajdujący się pomiędzy nimi znak (w tym przypadku od 0 do 9).
+- Dwie gwiazdki pozwalają dopasować zagnieżdzone katalogi; a/**/z dopasuje a/z, a/b/z, a/b/c/z, itd.
+
+* Przykład pliku .gitignore
+
+ # komentarz — ta linia jest ignorowana
+
+ # żadnych plików .a
+ *.a
+
+ # ale uwzględniaj lib.a, pomimo ignorowania .a w linijce powyżej
+ !lib.a
+
+ # ignoruj plik TODO w katalogu głównym, ale nie podkatalog/TODO
+ /TODO
+
+ # ignoruj wszystkie pliki znajdujące się w katalogu build/
+ build/
+
+ # ignoruj doc/notatki.txt, ale nie doc/server/arch.txt
+ doc/*.txt
+
+ # ignoruj wszystkie pliki .pdf znajdujące się w katalogu doc/
+ doc/**/*.pdf
+
+Wiele innych przykładów dostępnych na stronie: https://github.com/github/gitignore
+
+* Podgląd zmian w poczekalni i poza nią
+
+Polecenie *git* *diff* odpowiada na następujące pytania:
+
+- Co zmieniłeś, ale jeszcze nie trafiło do poczekalni?
+
+- Co znajduje się już w poczekalni, a co za chwilę zostanie zatwierdzone?
+
+* Podgląd zmian poza poczekalnią
+
+ $ git diff
+ diff --git a/CONTRIBUTING.md b/CONTRIBUTING.md
+ index 8ebb991..643e24f 100644
+ --- a/CONTRIBUTING.md
+ +++ b/CONTRIBUTING.md
+ @@ -65,7 +65,8 @@ branch directly, things can get messy.
+  Please include a nice description of your changes when you submit your PR;
+  if we have to read the whole diff to figure out why you're contributing
+  in the first place, you're less likely to get feedback and have your change
+ -merged in.
+ +merged in. Also, split your changes into comprehensive chunks if your patch is
+ +longer than a dozen lines.
+
+  If you are starting to work on a particular area, feel free to submit a PR
+  that highlights your work in progress (and note in the PR title that it's
+
+Uwaga! *git* *diff* pokazuje tylko zmiany nie dodane jeszcze do poczekalni.
+
+* Podgląd zmian w poczekalni
+Aby zobaczyć zmiany w poczekalni trzeba dodać opcję *--staged*.
+
+ $ git diff --staged
+ diff --git a/README b/README
+ new file mode 100644
+ index 0000000..03902a1
+ --- /dev/null
+ +++ b/README
+ @@ -0,0 +1 @@
+ +My Project
+
+* Zatwierdzanie zmian
+
+ $ git commit
+
+
+Zostanie uruchomiony wybrany przez ciebie edytor tekstu. Wybiera się go za pośrednictwem zmiennej środowiskową $EDITOR — zazwyczaj jest to vim lub emacs, możesz jednak wybrać własną aplikację używając polecenia
+
+ $ git config --global core.editor.
+
+Alternatywnie opis rewizji można podać już wydając polecenie commit, poprzedzając go flagą -m, jak poniżej:
+
+ $ git commit -m "Story 182: Fix benchmarks for speed"
+ [master 463dc4f] Story 182: Fix benchmarks for speed
+  2 files changed, 2 insertions(+)
+  create mode 100644 README
+
+* Pomijanie poczekalni
+
+Po dodaniu do składni polecenia git commit opcji *-a* każdy zmieniony plik, który jest już śledzony, automatycznie trafi do poczekalni, dzięki czemu pominiesz część git add:
+
+ $ git status
+ On branch master
+ Your branch is up-to-date with 'origin/master'.
+ Changes not staged for commit:
+   (use "git add <file>..." to update what will be committed)
+   (use "git checkout -- <file>..." to discard changes in working directory)
+
+     modified:   CONTRIBUTING.md
+
+ no changes added to commit (use "git add" and/or "git commit -a")
+ $ git commit -a -m 'added new benchmarks'
+ [master 83e38c7] added new benchmarks
+  1 file changed, 5 insertions(+), 0 deletions(-)
+
+* Usuwanie plików
+
+Aby usunąć plik z Gita, należy go najpierw wyrzucić ze zbioru plików śledzonych, a następnie zatwierdzić zmiany. Służy do tego polecenie *git* *rm*, które dodatkowo usuwa plik z katalogu roboczego. Nie zobaczysz go już zatem w sekcji plików nieśledzonych przy następnej okazji.
+
+Jeżeli po prostu usuniesz plik z katalogu roboczego i wykonasz polecenie git status zobaczysz go w sekcji "Zmienione ale nie zaktualizowane" (Changes not staged for commit) (czyli, poza poczekalnią):
+
+ $ rm PROJECTS.md
+ $ git status
+ On branch master
+ Your branch is up-to-date with 'origin/master'.
+ Changes not staged for commit:
+  (use "git add/rm <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+        deleted:    PROJECTS.md
+
+ no changes added to commit (use "git add" and/or "git commit -a")
+
+* Usuwanie plików
+
+W dalszej kolejności, uruchomienie *git* *rm* doda do poczekalni operację usunięcia pliku:
+
+ $ git rm PROJECTS.md
+ rm 'PROJECTS.md'
+ $ git status
+ On branch master
+ Your branch is up-to-date with 'origin/master'.
+ Changes to be committed:
+   (use "git reset HEAD <file>..." to unstage)
+
+     deleted:    PROJECTS.md
+
+Przy kolejnej rewizji, plik zniknie i nie będzie dłużej śledzony.
+
+* Usuwanie plików
+Aby usunąć plik z Gita ale zachować go w kopii roboczej należy uzyć opcji *--cached*:
+
+ $ git rm --cached readme.txt
+
+* Przenoszenie plików
+
+Git nie śledzi bezpośrednio przesunięć plików. Skąd więc komenda *mv*?
+
+ $ git mv file_from file_to
+
+Powoduje ona dodanie operacji zmiany nazwy do poczekalni:
+
+ $ git mv README.md README
+ $ git status
+ On branch master
+ Your branch is up-to-date with 'origin/master'.
+ Changes to be committed:
+   (use "git reset HEAD <file>..." to unstage)
+
+     renamed:    README.md -> README
+
+Jest tożsama z wykonaniem:
+
+ $ mv README.md README
+ $ git rm README.md
+ $ git add README
+
+* Podgląd historii rewizji - prosty przykładowy projekt:
+
+ $ git clone https://github.com/schacon/simplegit-progit
+
+Sprawdźmy jakie zmiany zawiera historia tego projektu:
+
+ $ git log
+ commit ca82a6dff817ec66f44342007202690a93763949
+ Author: Scott Chacon <schacon@gee-mail.com>
+ Date:   Mon Mar 17 21:52:11 2008 -0700
+
+    changed the version number
+
+ commit 085bb3bcb608e1e8451d4b2432f8ecbe6306e7e7
+ Author: Scott Chacon <schacon@gee-mail.com>
+ Date:   Sat Mar 15 16:40:33 2008 -0700
+
+    removed unnecessary test
+
+ commit a11bef06a3f659402fe7563abf99ad00de2209e6
+ Author: Scott Chacon <schacon@gee-mail.com>
+ Date:   Sat Mar 15 10:31:28 2008 -0700
+
+    first commit
+
+
+*  Przeglądanie historii: opcja --pretty
+
+Opcja *--pretty* pozwala użyć jednego z predefiniowanych formatów:
+
+- oneline
+- short
+- full
+- fuller
+
+    $ git log --pretty=oneline
+    ca82a6dff817ec66f44342007202690a93763949 changed the version number
+    085bb3bcb608e1e8451d4b2432f8ecbe6306e7e7 removed unnecessary test
+    a11bef06a3f659402fe7563abf99ad00de2209e6 first commit
+
+
+*  Przeglądanie historii: własny format
+ $ git log --pretty=format:"%h - %an, %ar : %s"
+ ca82a6d - Scott Chacon, 6 years ago : changed the version number
+ 085bb3b - Scott Chacon, 6 years ago : removed unnecessary test
+ a11bef0 - Scott Chacon, 6 years ago : first commit
+
+* Opcje formatowania
+
+# %H Commit hash
+# %h Abbreviated commit hash
+# %T Tree hash
+# %t Abbreviated tree hash
+# %P Parent hashes
+# %p Abbreviated parent hashes
+# %an Author name
+# %ae Author email
+# %ad Author date (format respects the --date=option)
+# %ar Author date, relative
+# %cn Committer name
+# %ce Committer email
+# %cd Committer date
+# %cr Committer date, relative
+# %s Subject
+
+
+ %H	Suma kontrolna zmiany
+ %h	Skrócona suma kontrolna zmiany
+ %T	Suma kontrolna drzewa
+ %t	Skrócona suma kontrolna drzewa
+ %P	Sumy kontrolne rodziców
+ %p	Skrócone sumy kontrolne rodziców
+ %an	Nazwisko autora
+ %ae	Adres e-mail autora
+ %ad	Data autora (format respektuje opcję -date=)
+ %ar	Względna data autora
+ %cn	Nazwisko zatwierdzającego zmiany
+ %ce	Adres e-mail zatwierdzającego zmiany
+ %cd	Data zatwierdzającego zmiany
+ %cr	Data zatwierdzającego zmiany, względna
+ %s	Temat
+
+* Przeglądanie historii: opcja --graph
+
+ $ git log --pretty=format:"%h %s" --graph
+ * 2d3acf9 ignore errors from SIGCHLD on trap
+ *  5e3ee11 Merge branch 'master' of git://github.com/dustin/grit
+ |\
+ | * 420eac9 Added a method for getting the current branch.
+ * | 30e367c timeout code and tests
+ * | 5a09431 add timeout protection to grit
+ * | e1193f8 support for heads with slashes in them
+ |/
+ * d6016bc require time for xmlschema
+ *  11d191e Merge branch 'defunkt' into local
+
+* Ograniczanie wyniku historii
+
+ -(n)               Pokaż tylko ostatnie n rewizji.
+ --since, --after   Ogranicza rewizje do tych wykonanych po określonej dacie.
+ --until, --before  Ogranicza rewizje do tych wykonanych przed określoną datą.
+ --author           Pokazuje rewizje, których wpis autora pasuje do podanego.
+ --committer        Pokazuje rewizje, w których osoba zatwierdzająca zmiany pasuje do podanej.
+ --grep             Pokazuje rewizje, które zawierają podany łańcuch znaków w opisie
+ -S                 Pokazuje rewizje, które dodają bądź usuwają podany łańcuch znaków do/z kodu
+
+
+Przykłady:
+
+ $ git log --since=2.weeks
+ $ git log -Sfunction_name
+
+Można podać też ścieżkę wewnątrz projektu którego ma dotyczyć historia:
+
+ $ git log lib/
+
+* Cofanie zmian - Poprawka do ostatniej rewizji
+
+ $ git commit --amend
+
+Przykład: Zapomniałem dodać pliku
+
+ $ git commit -m 'initial commit'
+ $ git add forgotten_file
+ $ git commit --amend
+
+
+* Cofanie zmian - Usuwanie pliku z poczekalni
+ $ git add *
+ $ git status
+ On branch master
+ Changes to be committed:
+   (use "git reset HEAD <file>..." to unstage)
+
+    renamed:    README.md -> README
+    modified:   CONTRIBUTING.md
+
+Jeśli nie chceliśmy dodawać wszystkich plików, Git podpowiada nam jak naprawić pomyłkę.
+
+
+* Cofanie zmian - Usuwanie pliku z poczekalni
+    $ git reset HEAD CONTRIBUTING.md
+    Unstaged changes after reset:
+    M	CONTRIBUTING.md
+    $ git status
+    On branch master
+    Changes to be committed:
+      (use "git reset HEAD <file>..." to unstage)
+
+        renamed:    README.md -> README
+
+    Changes not staged for commit:
+      (use "git add <file>..." to update what will be committed)
+      (use "git checkout -- <file>..." to discard changes in working directory)
+
+        modified:   CONTRIBUTING.md
+
+
+* Cofanie zmian - Cofanie zmian w zmodyfikowanym pliku
+Usunęliśmy zmiany z poczekalni ale nadal są obecne w katalogu roboczym, jak pokazało polecenie git status na poprzednim slajdzie:
+
+        Changes not staged for commit:
+          (use "git add <file>..." to update what will be committed)
+          (use "git checkout -- <file>..." to discard changes in working directory)
+
+            modified:   CONTRIBUTING.md
+
+Git konkretnie wskazuje jak pozbyć się dokonanych zmian. Do dzieła:
+
+ $ git checkout -- CONTRIBUTING.md
+ $ git status
+     On branch master
+     Changes to be committed:
+            (use "git reset HEAD <file>..." to unstage)
+
+                renamed:    README.md -> README
+
+Uwaga! Możemy stracić nasze zmiany na zawsze!
+
+
+* Cofanie zmian - git revert
+
+Aby stworzyć zatwierdzenie odwołujące zmiany z ostatniego zatwierdzenia w gałęzi:
+
+ $ git revert HEAD
+
+Aby odwołać czwartą z kolei:
+
+ $ git revert HEAD~3
+
+Aby odwołać zmiany od piątej do trzeciej
+
+ $ git revert master~5..master~2
+
+* Praca ze zdalnymi repozytoriami
+* Wyświetlanie zdalnych repozytoriów - git remote
+
+ $ git clone git://github.com/schacon/ticgit.git
+ Initialized empty Git repository in /private/tmp/ticgit/.git/
+ remote: Counting objects: 595, done.
+ remote: Compressing objects: 100% (269/269), done.
+ remote: Total 595 (delta 255), reused 589 (delta 253)
+ Receiving objects: 100% (595/595), 73.31 KiB | 1 KiB/s, done.
+ Resolving deltas: 100% (255/255), done.
+ $ cd ticgit
+ $ git remote
+ origin
+
+* Wyświetlanie zdalnych repozytoriów - git remote
+ $ git remote -v
+ origin	https://github.com/schacon/ticgit (fetch)
+ origin	https://github.com/schacon/ticgit (push)
+
+* Wiele zdalnych repozytoriów
+ $ cd grit
+ $ git remote -v
+ bakkdoor  https://github.com/bakkdoor/grit (fetch)
+ bakkdoor  https://github.com/bakkdoor/grit (push)
+ cho45     https://github.com/cho45/grit (fetch)
+ cho45     https://github.com/cho45/grit (push)
+ defunkt   https://github.com/defunkt/grit (fetch)
+ defunkt   https://github.com/defunkt/grit (push)
+ koke      git://github.com/koke/grit.git (fetch)
+ koke      git://github.com/koke/grit.git (push)
+ origin    git@github.com:mojombo/grit.git (fetch)
+ origin    git@github.com:mojombo/grit.git (push)
+
+* Dodawanie zdalnych repozytoriów
+ $ git remote
+ origin
+ $ git remote add pb https://github.com/paulboone/ticgit
+ $ git remote -v
+ origin https://github.com/schacon/ticgit (fetch)
+ origin https://github.com/schacon/ticgit (push)
+ pb
+ https://github.com/paulboone/ticgit (fetch)
+ pb
+ https://github.com/paulboone/ticgit (push)
+
+* Pobieranie zmian ze zdefiniowanych zdalnych repozytoriów
+ $ git fetch pb
+ remote: Counting objects: 43, done.
+ remote: Compressing objects: 100% (36/36), done.
+ remote: Total 43 (delta 10), reused 31 (delta 5)
+ 70Working with Remotes
+ Unpacking objects: 100% (43/43), done.
+ From https://github.com/paulboone/ticgit
+ * [new branch]
+ master
+ -> pb/master
+ * [new branch]
+ ticgit
+ -> pb/ticgit
+
+* Pobieranie zmian ze zdefiniowanych zdalnych repozytoriów
+
+git pull = git fetch + git merge
+
+* Wysyłanie zmian do zdalnych repozytoriów
+
+git push [remote-name] [branch-name]:
+
+ $ git push origin master
+
+* Konfiguracja - domyślna konfiguracja dla "git push"
+
+  git config --global push.default simple
+
+Dostępne opcje:
+
+- *nothing* - nie wysyła zmian bez jawnego podania gałęzi
+- *current* - wysyła tylko zmiany z aktualnej gałęzi, pod warunkiem, że zdalna ma identyczną nazwę
+- *upstream* - wysyła zmiany do brancha z którego domyślnie je pobieramy
+- *simple* - dla domyślnego repo działa jak upstream, dla pozostałych jak current (domyślne od wersji 2.0)
+- *matching* - wysyła zmiany ze wszystkich gałęzi, dla których istnieje zdalna gałąź o tej samej nazwie (domyślne do wersji 2.0)
+
+
+* Dodatkowe informacje o zdalnym repozytorium
+
+
+ $ git remote show origin
+ * remote origin
+ Fetch URL: https://github.com/schacon/ticgit
+ Push URL: https://github.com/schacon/ticgit
+ HEAD branch: master
+ Remote branches:
+ master tracked
+ dev-branch tracked
+ Local branch configured for 'git pull':
+ master merges with remote master
+ Local ref configured for 'git push':
+ master pushes to master (up to date)
+
+* Zmiana nazwy zdalnego repozytorium
+
+ $ git remote rename pb paul
+ $ git remote
+ origin
+ paul
+
+* Usuwanie zdalnego repozytorium
+
+ $ git remote rm paul
+ $ git remote
+ origin
+
+
+* Tagowanie (etykietowanie)
+
+* Listowanie etykiet
+ $ git tag
+ v0.1
+ v1.3
+
+Użycie wzroca:
+
+ $ git tag -l 'v1.4.2.*'
+ v1.4.2.1
+ v1.4.2.2
+ v1.4.2.3
+ v1.4.2.4
+
+* Tworzenie etykiet
+Git używa 2 głównych rodzajów etykiet:
+
+- *lekkich* - zachowują się mniej więcej tak jak gałąź, która się nie zmienia - jest to tylko wskaźnik do konkretnej rewizji.
+- *opisanych* - są przechowywane jako pełne obiekty w bazie danych Gita. Są one opatrywane sumą kontrolną, zawierają nazwisko osoby etykietującej, jej adres e-mail oraz datę; ponadto, posiadają notkę etykiety, oraz mogą być podpisywane i weryfikowane za pomocą GNU Privacy Guard (GPG).
+
+* Etykiety opisane
+
+ $ git tag -a v1.4 -m "my version 1.4"
+ $ git tag
+ v0.1
+ v1.3
+ v1.4
+
+Wyświetlanie danych etykiety wraz z danymi rewizji:
+
+  $ git show v1.4
+  tag v1.4
+  Tagger: Ben Straub <ben@straub.cc>
+  Date:   Sat May 3 20:19:12 2014 -0700
+
+  my version 1.4
+
+  commit ca82a6dff817ec66f44342007202690a93763949
+  Author: Scott Chacon <schacon@gee-mail.com>
+  Date:   Mon Mar 17 21:52:11 2008 -0700
+
+      changed the version number
+
+* Etykiety lekkie
+
+ $ git tag v1.4-lw
+ $ git tag
+ v0.1
+ v1.3
+ v1.4
+ v1.4-lw
+ v1.5
+
+Wyświetlają się tylko dane rewizji:
+
+ $ git show v1.4-lw
+ commit ca82a6dff817ec66f44342007202690a93763949
+ Author: Scott Chacon <schacon@gee-mail.com>
+ Date:   Mon Mar 17 21:52:11 2008 -0700
+
+     changed the version number
+
+* Etykietowanie historii
+
+ $ git log --pretty=oneline
+ 15027957951b64cf874c3557a0f3547bd83b3ff6 Merge branch 'experiment'
+ a6b4c97498bd301d84096da251c98a07c7723e65 beginning write support
+ 0d52aaab4479697da7686c15f77a3d64d9165190 one more thing
+ 6d52a271eda8725415634dd79daabbc4d9b6008e Merge branch 'experiment'
+ 0b7434d86859cc7b8c3d5e1dddfed66ff742fcbc added a commit function
+ 4682c3261057305bdd616e23b64b0857d832627b added a todo file
+ 166ae0c4d3f420721acbb115cc33848dfcc2121a started write support
+ 9fceb02d0ae598e95dc970b74767f19372d61af8 updated rakefile
+ 964f16d36dfccde844893cac5b347e7b3d44abbc commit the todo
+ 8a5cbc430f1a9c3d00faaeffd07798508422908a updated readme
+
+Oops! Zapomnieliśmhy dodać taga do rewizji 9fceb02d0ae598e95dc970b74767f19372d61af8 :( Ale nic straconego!
+
+ $ git tag -a v1.2 9fceb02
+
+* Współdzielenie etykiet
+
+Pojedynczo:
+
+ $ git push origin v1.5
+ Counting objects: 50, done.
+ Compressing objects: 100% (38/38), done.
+ Writing objects: 100% (44/44), 4.56 KiB, done.
+ Total 44 (delta 18), reused 8 (delta 1)
+ To git@github.com:schacon/simplegit.git
+ * [new tag]         v1.5 -> v1.5
+
+Albo wszystkie na raz:
+
+ $ git push origin --tags
+ Counting objects: 1, done.
+ Writing objects: 100% (1/1), 160 bytes | 0 bytes/s, done.
+ Total 1 (delta 0), reused 0 (delta 0)
+ To git@github.com:schacon/simplegit.git
+  * [new tag]         v1.4 -> v1.4
+  * [new tag]         v1.4-lw -> v1.4-lw
+
+* Przełączanie się na etykietę
+
+Przełączanie się na samą etykietę najczęściej nie ma sensu (nie można jej zmieniać).
+Najlepiej więc od razu utworzyć w tym miejscu nową gałąź:
+
+ $ git checkout -b version2 v2.0.0
+ Switched to a new branch 'version2'
+
+* Aliasy - prosty sposób na ułatwienie sobie życia
+
+ $ git config --global alias.co checkout
+ $ git config --global alias.br branch
+ $ git config --global alias.ci commit
+ $ git config --global alias.st status
+
+
+* Gałęzie Gita
+
+* Gałęzie Gita
+
+Załóżmy, że mamy katalog z trzema plikami i zatwierdzamy je do Git'a
+
+ $ git add README test.rb LICENSE
+ $ git commit -m 'The initial commit of my project'
+
+* Gałęzie Gita
+.image images/03-git-branching/images/commit-and-tree.png
+* Gałęzie Gita
+.image images/03-git-branching/images/commits-and-parents.png
+* Gałęzie Gita
+.image images/03-git-branching/images/branch-and-history.png
+* Gałęzie Gita
+ $ git branch testing
+.image images/03-git-branching/images/two-branches.png
+* Gałęzie Gita
+.image images/03-git-branching/images/head-to-master.png
+
+
+* Gałęzie Gita
+ $ git log --oneline --decorate
+ f30ab (HEAD -> master, testing) add feature #32 - ability to add new formats to the central interface
+ 34ac2 Fixed bug #1328 - stack overflow under certain conditions
+ 98ca9 The initial commit of my project
+
+* Gałęzie Gita
+ $ git checkout testing
+.image images/03-git-branching/images/head-to-testing.png
+* Gałęzie Gita
+ $ vim test.rb
+ $ git commit -a -m 'made a change'
+.image images/03-git-branching/images/advance-testing.png
+* Gałęzie Gita
+ $ git checkout master
+.image images/03-git-branching/images/checkout-master.png
+Zmiana gałęzi powoduje zmiany plików w katalogu roboczym!
+
+* Gałęzie Gita
+
+ $ vim test.rb
+ $ git commit -a -m 'made other changes'
+
+.image images/03-git-branching/images/advance-master.png
+
+* Gałęzie Gita
+ $ git log --oneline --decorate --graph --all
+ * c2b9e (HEAD, master) made other changes
+ | * 87ab2 (testing) made a change
+ |/
+ * f30ab add feature #32 - ability to add new formats to the
+ * 34ac2 fixed bug #1328 - stack overflow under certain conditions
+ * 98ca9 initial commit of my project
+
+
+# 3.2 - Gałęzie Gita - Podstawy rozgałęziania i scalania
+* Gałęzie Gita - Podstawy rozgałęziania i scalania
+
+* Gałęzie Gita - Podstawy rozgałęziania i scalania
+.image images/03-git-branching/images/basic-branching-1.png
+* Gałęzie Gita - Podstawy rozgałęziania i scalania
+
+ $ git checkout -b iss53
+ Switched to a new branch "iss53"
+To skrótowy zapis dla:
+
+ $ git branch iss53
+ $ git checkout iss53
+
+* Gałęzie Gita - Podstawy rozgałęziania i scalania
+.image images/03-git-branching/images/basic-branching-2.png
+* Gałęzie Gita - Podstawy rozgałęziania i scalania
+ $ vim index.html
+ $ git commit -a -m 'added a new footer [issue 53]'
+.image images/03-git-branching/images/basic-branching-3.png
+
+* Gałęzie Gita - Podstawy rozgałęziania i scalania
+Nagle okazuje się, że mamy błąd na produkcji! Musimy szybko go naprawić. Wróćmy do stanu kodu jaki mamy na produkcji:
+
+ $ git checkout master
+ Switched to branch 'master'
+
+Następnie stwórzmy poprawkę w nowej gałęzi
+
+ $ git checkout -b hotfix
+ Switched to a new branch 'hotfix'
+ $ vim index.html
+ $ git commit -a -m 'fixed the broken email address'
+ [hotfix 1fb7853] fixed the broken email address
+   1 file changed, 2 insertions(+)
+
+* Gałęzie Gita - Podstawy rozgałęziania i scalania
+Po przetestowaniu poprawki możemy dodać ją do gałęzi 'master'
+
+ $ git checkout master
+ $ git merge hotfix
+ Updating f42c576..3a0874c
+ Fast-forward
+ index.html | 2 ++
+ 1 file changed, 2 insertions(+)
+
+Proszę zwrócić uwagę na linijkę "Fast-forward"
+
+
+
+* Gałęzie Gita - Podstawy rozgałęziania i scalania
+.image images/03-git-branching/images/basic-branching-4.png
+* Gałęzie Gita - Podstawy rozgałęziania i scalania
+.image images/03-git-branching/images/basic-branching-5.png
+* Gałęzie Gita - Podstawy rozgałęziania i scalania
+Wdrożyliśmy poprawkę na produkcję. Kryzys zażegnany. Gałąź 'hotfix' nie będzie nam już potrzebna.
+
+ $ git branch -d hotfix
+ Deleted branch hotfix (3a0874c).
+
+Możemy wracać do normalnej pracy:
+
+ $ git checkout iss53
+ Switched to branch "iss53"
+ $ vim index.html
+ $ git commit -a -m 'finished the new footer [issue 53]'
+ [iss53 ad82d7a] finished the new footer [issue 53]
+ 1 file changed, 1 insertion(+)
+
+* Gałęzie Gita - Podstawy rozgałęziania i scalania
+.image images/03-git-branching/images/basic-branching-6.png
+* Gałęzie Gita - Podstawy rozgałęziania i scalania
+Zestaw zmian z aktualnej gałęzi, nie jest bezpośrednim potomkiem gałęzi, którą scalamy, więc Git musi w końcu popracować. W tym przypadku Git przeprowadza scalenie trójstronne (ang. three-way merge), używając dwóch migawek wskazywanych przez końcówki gałęzi oraz ich wspólnego przodka.
+.image images/03-git-branching/images/basic-merging-1.png
+* Gałęzie Gita - Podstawy rozgałęziania i scalania
+Zamiast zwykłego przeniesienia wskaźnika gałęzi do przodu, Git tworzy nową migawkę, która jest wynikiem wspomnianego scalenia trójstronnego i automatycznie tworzy nowy zestaw zmian, wskazujący na ową migawkę.
+
+.image images/03-git-branching/images/basic-merging-2.png
+
+
+# 3.4 Gałęzie Gita - Branching Workflows
+* Gałęzie Gita - Sposoby pracy z gałęziami
+
+* Gałęzie długodystansowe
+Stabilniejsze gałęzie z reguły znajdują się wcześniej w historii zmian.
+
+.image images/03-git-branching/images/lr-branches-1.png
+.image images/03-git-branching/images/lr-branches-2.png
+
+* Gałęzie tematyczne
+.image images/03-git-branching/images/topic-branches-1.png 550 _
+* Gałęzie tematyczne
+.image images/03-git-branching/images/topic-branches-2.png 550 _
+
+
+* Gałęzie zdalne
+.image images/03-git-branching/images/remote-branches-1.png
+* Gałęzie zdalne
+.image images/03-git-branching/images/remote-branches-2.png
+* Gałęzie zdalne
+.image images/03-git-branching/images/remote-branches-3.png
+* Gałęzie zdalne
+.image images/03-git-branching/images/remote-branches-4.png
+* Gałęzie zdalne
+.image images/03-git-branching/images/remote-branches-5.png
+
+* Zapamiętywanie haseł do zdalnego repozytorium
+
+ $ git config --global credential.helper cache
+
+* Gałęzie Gita - Zmiana bazy
+* Gałęzie Gita - Zmiana bazy
+Wrócmy do sytuacji z dwoma rozbieżnymi gałęziami:
+.image images/03-git-branching/images/basic-rebase-1.png
+* Gałęzie Gita - Zmiana bazy
+Wiemy już, że możemy użyć polecenia *git* *merge*:
+.image images/03-git-branching/images/basic-rebase-2.png
+* Gałęzie Gita - Zmiana bazy
+Inny sposób to tzw. zmiana bazy (rebase):
+
+ $ git checkout experiment
+ $ git rebase master
+ First, rewinding head to replay your work on top of it...
+ Applying: added staged command
+
+.image images/03-git-branching/images/basic-rebase-3.png
+* Gałęzie Gita - Zmiana bazy
+W tym momencie możemy wrócić do gałęzi master i scalić zmiany wykonując proste przesunięcie wskaźnika (fast-forward ), co przesunie wskaźnik master na koniec.
+
+ $ git checkout master
+ $ git merge experiment
+.image images/03-git-branching/images/basic-rebase-4.png
+
+
+* Gałęzie Gita - Zmiana bazy - ciekawy przypadek
+.image images/03-git-branching/images/interesting-rebase-1.png
+* Gałęzie Gita - Zmiana bazy
+
+ $ git rebase --onto master server client
+
+.image images/03-git-branching/images/interesting-rebase-2.png
+* Gałęzie Gita - Zmiana bazy
+
+ $ git checkout master
+ $ git merge client
+.image images/03-git-branching/images/interesting-rebase-3.png
+* Gałęzie Gita - Zmiana bazy
+
+ $ git rebase master server
+
+.image images/03-git-branching/images/interesting-rebase-4.png _ 990
+* Gałęzie Gita - Zmiana bazy
+
+ $ git checkout master
+ $ git merge server
+
+Możemy teraz usunąć gałęzie client i server
+
+ $ git branch -d client
+ $ git branch -d server
+
+.image images/03-git-branching/images/interesting-rebase-5.png _ 990
+
+* Zagrożenia operacji zmiany bazy
+
+Nie zmieniaj bazy rewizji, które wypchnąłeś już do publicznego repozytorium!
+
+* Zagrożenia operacji zmiany bazy
+.image images/03-git-branching/images/perils-of-rebasing-1.png
+* Zagrożenia operacji zmiany bazy
+.image images/03-git-branching/images/perils-of-rebasing-2.png
+* Zagrożenia operacji zmiany bazy
+.image images/03-git-branching/images/perils-of-rebasing-3.png
+* Zagrożenia operacji zmiany bazy
+.image images/03-git-branching/images/perils-of-rebasing-4.png
+* Zagrożenia operacji zmiany bazy
+.image images/03-git-branching/images/perils-of-rebasing-5.png
+
+
+
+
+
+
+
+
+
+
+* Zdalne repozytorium
+
+* Zdalne repozytorium - Protokoły
+
+- Lokalny - file://
+- Mądry HTTP - http:// i https://
+- Głupi HTTP - http:// i https://
+- SSH - ssh://
+- Git - git://
+
+* Konfiguracja serwera
+
+ $ sudo adduser git
+ $ su git
+ $ cd
+ $ mkdir .ssh && chmod 700 .ssh
+ $ touch .ssh/authorized_keys && chmod 600 .ssh/authorized_keys
+
+Dodajemy klucze userów:
+
+ $ cat /tmp/id_rsa.john.pub >> ~/.ssh/authorized_keys
+ $ cat /tmp/id_rsa.josie.pub >> ~/.ssh/authorized_keys
+ $ cat /tmp/id_rsa.jessica.pub >> ~/.ssh/authorized_keys
+
+Tworzymy nowe repo:
+
+ $ cd /opt/git
+ $ mkdir project.git
+ $ cd project.git
+ $ git init --bare
+ Initialized empty Git repository in /opt/git/project.git/
+
+* Praca w środowisku rozproszonym
+
+* Scentralizowany przepływ pracy
+.image images/05-distributed-git/images/centralized_workflow.png
+
+* Przepływ pracy z osobą integrującą zmiany
+.image images/05-distributed-git/images/integration-manager.png
+
+* Przepływ pracy z miłościwym dyktatorem
+.image images/05-distributed-git/images/benevolent-dictator.png
+
+* Gitflow
+.image images/git_flow.png 550 _
+
+* Narzędzia
+
+* Wskazywanie rewizji - Pojedyncze rewizje
+
+Krótki SHA:
+
+ $ git show 1c002dd4b536e7479fe34593e72e6c6c1819e53b
+ $ git show 1c002dd4b536e7479f
+ $ git show 1c002d
+
+Poprośmy Gita o podanie krótszych identyfikatorów:
+
+ $ git log --abbrev-commit --pretty=oneline
+ ca82a6d changed the version number
+ 085bb3b removed unnecessary test code
+ a11bef0 first commit
+
+Odniesienie do gałęzi:
+
+ $ git show ca82a6dff817ec66f44342007202690a93763949
+ $ git show topic1
+
+* Jak często zdarzają się konflikty SHA-1
+Jeżeli wszyscy z 6,5 miliarda osób na ziemi byliby programistami i w każdej sekundzie, każdy z nich tworzyłby kod wielkości całego jądra Linuksa (1 milion obiektów Gita) i wgrywał go do ogromnego repozytorium Gita, zajęłoby około 5 lat, zanim w repozytorium byłoby tyle obiektów, aby mieć pewność 50% wystąpienia kolizji. Istnieje większe prawdopodobieństwo, że każdy z członków Twojego zespołu programistycznego zostanie zaatakowany i zabity przez wilki, w nie związanych ze sobą zdarzeniach, w ciągu tej samej nocy.
+
+
+* Wskazywanie rewizji - Pojedyncze rewizje
+Skróty do RefLog:
+
+ $ git reflog
+ 734713b HEAD@{0}: commit: fixed refs handling, added gc auto, updated
+ d921970 HEAD@{1}: merge phedders/rdocs: Merge made by recursive.
+ 1c002dd HEAD@{2}: commit: added some blame and merge stuff
+ 1c36188 HEAD@{3}: rebase -i (squash): updating HEAD
+ 95df984 HEAD@{4}: commit: # This is a combination of two commits.
+ 1c36188 HEAD@{5}: rebase -i (squash): updating HEAD
+ 7e05da5 HEAD@{6}: rebase -i (pick): updating HEAD
+
+Odwołujemy się przez SHA lub:
+
+ $ git show HEAD@{5}
+
+Można też tak:
+
+ $ git show master@{yesterday}
+
+* Wskazywanie rewizji - Pojedyncze rewizje
+Aby zobaczyć wynik reflog-a w formacie podobnym do wyniku git log, można uruchomić git log -g:
+
+ $ git log -g master
+ commit 734713bc047d87bf7eac9674765ae793478c50d3
+ Reflog: master@{0} (Scott Chacon <schacon@gmail.com>)
+ Reflog message: commit: fixed refs handling, added gc auto, updated
+ Author: Scott Chacon <schacon@gmail.com>
+ Date:   Fri Jan 2 18:32:33 2009 -0800
+
+     fixed refs handling, added gc auto, updated tests
+
+ commit d921970aadf03b3cf0e71becdaab3147ba71cdef
+ Reflog: master@{1} (Scott Chacon <schacon@gmail.com>)
+ Reflog message: merge phedders/rdocs: Merge made by recursive.
+ Author: Scott Chacon <schacon@gmail.com>
+ Date:   Thu Dec 11 15:08:43 2008 -0800
+
+     Merge commit 'phedders/rdocs'
+
+
+* Wskazywanie rewizji - Referencje przodków
+
+*HEAD^* oznacza "rodzic HEAD-a":
+
+*d921970^2* oznacza "drugi rodzic d921970"
+
+*HEAD~* także wskazuje pierwszego rodzica
+
+*HEAD~2* oznacza "pierwszy rodzic pierwszego rodzica", lub inaczej "dziadek" - przemierza to pierwszych rodziców tyle razy, ile wskażesz.
+
+Można łączyć obie składnie - np. dostać drugiego rodzica poprzedniej referencji (zakładając że było to łączenie zmian) przy użyciu *HEAD~3^2*
+
+* Wskazywanie rewizji - Zakresy zmian
+
+.image images/07-git-tools/images/double-dot.png
+
+ $ git log master..experiment
+ D
+ C
+
+master..experiment - oznacza "wszystkie zmiany dostępne z experiment które nie są dostępne przez master".
+Możemy też poprosić o informację odwrotną:
+
+ $ git log experiment..master
+ F
+ E
+
+* Wskazywanie rewizji - Zakresy zmian
+
+Często używanym przykładem użycia tej składni jest sprawdzenie, co zamierzasz wypchnąć do zdalnego repozytorium:
+
+ $ git log origin/master..HEAD
+
+* Wskazywanie rewizji - Potrójna kropka
+
+Aby zobaczyć co jest zmienione w master lub experiment, poza wspólnymi:
+
+ $ git log master...experiment
+ F
+ E
+ D
+ C
+
+Opcja *--left-right* pokazuje po której stronie każda zmiana występuje:
+
+ $ git log --left-right master...experiment
+ < F
+ < E
+ > D
+ > C
+
+.image images/07-git-tools/images/double-dot.png
+
+* Interaktywne używanie przechowalni
+
+ $ git add -i
+           staged     unstaged path
+  1:    unchanged        +0/-1 TODO
+  2:    unchanged        +1/-1 index.html
+  3:    unchanged        +5/-1 lib/simplegit.rb
+
+ *** Commands ***
+  1: status     2: update      3: revert     4: add untracked
+  5: patch      6: diff        7: quit       8: help
+ What now>
+
+* Schowek
+
+git stash [save]
+git stash list
+git stash apply
+git stash apply stash@{2}
+git stash apply --index
+git stash drop
+git stash pop
+git stash branch
+
+* Przepisywanie Historii
+* Przepisywanie Historii - Zmienianie ostatniego commita
+
+ $ git commit --amend
+
+* Przepisywanie Historii - Interaktywna zmiana bazy
+
+ $ git rebase -i HEAD~3
+
+Git zapyta nas co robić:
+
+ pick f7f3f6d changed my name a bit
+ pick 310154e updated README formatting and added blame
+ pick a5f4a0d added cat-file
+
+ # Rebase 710f0f8..a5f4a0d onto 710f0f8
+ #
+ # Commands:
+ #  p, pick = use commit
+ #  e, edit = use commit, but stop for amending
+ #  s, squash = use commit, but meld into previous commit
+ #
+ # If you remove a line here THAT COMMIT WILL BE LOST.
+ # However, if you remove everything, the rebase will be aborted.
+ #
+
+
+* Przepisywanie Historii - Interaktywna zmiana bazy
+
+Możliwości:
+
+- Zmiana kilku komentarzy jednocześnie
+- Zmiana kolejności commitów
+- Łączenie commitów
+- Rozdzielanie commitów
+- Poprawki w jednym lub wielu commitach
+
+* Debugowanie z Gitem
+* Debugowanie z Gitem - Adnotacje plików
+
+ $ git blame -L 12,22 simplegit.rb
+ ^4832fe2 (Scott Chacon  2008-03-15 10:31:28 -0700 12)  def show(tree = 'master')
+ ^4832fe2 (Scott Chacon  2008-03-15 10:31:28 -0700 13)   command("git show #{tree}")
+ ^4832fe2 (Scott Chacon  2008-03-15 10:31:28 -0700 14)  end
+ ^4832fe2 (Scott Chacon  2008-03-15 10:31:28 -0700 15)
+ 9f6560e4 (Scott Chacon  2008-03-17 21:52:20 -0700 16)  def log(tree = 'master')
+ 79eaf55d (Scott Chacon  2008-04-06 10:15:08 -0700 17)   command("git log #{tree}")
+ 9f6560e4 (Scott Chacon  2008-03-17 21:52:20 -0700 18)  end
+ 9f6560e4 (Scott Chacon  2008-03-17 21:52:20 -0700 19)
+ 42cf2861 (Magnus Chacon 2008-04-13 10:45:01 -0700 20)  def blame(path)
+ 42cf2861 (Magnus Chacon 2008-04-13 10:45:01 -0700 21)   command("git blame #{path}")
+ 42cf2861 (Magnus Chacon 2008-04-13 10:45:01 -0700 22)  end
+
+
+* Debugowanie z Gitem - Szukanie binarne
+
+ $ git bisect start
+ $ git bisect bad
+ $ git bisect good v1.0
+ Bisecting: 6 revisions left to test after this
+ [ecb6e1bc347ccecc5f9350d878ce677feb13d3b2] error handling on repo
+
+Odpalamy testy i informujemy gita czy przechodzą czy nie.
+Na koniec trzeba pamiętać o :
+
+ $ git bisect reset
+
+Możemy ten proces jeszcze bardziej zautomatyzować:
+
+ $ git bisect start HEAD v1.0
+ $ git bisect run test-error.sh
+
+* Moduły zależne
+
+ $ git submodule add https://github.com/chaconinc/DbConnector
+ Cloning into 'DbConnector'...
+ remote: Counting objects: 11, done.
+ remote: Compressing objects: 100% (10/10), done.
+ remote: Total 11 (delta 0), reused 11 (delta 0)
+ Unpacking objects: 100% (11/11), done.
+ Checking connectivity... done.
+
+Sprawdźmy efekt:
+
+  $ git status
+  On branch master
+  Your branch is up-to-date with 'origin/master'.
+
+  Changes to be committed:
+    (use "git reset HEAD <file>..." to unstage)
+
+   new file:   .gitmodules
+   new file:   DbConnector
+
+* Klonowanie projektu z modułami zależnymi
+   $ git clone https://github.com/chaconinc/MainProject
+   Cloning into 'MainProject'...
+   remote: Counting objects: 14, done.
+   remote: Compressing objects: 100% (13/13), done.
+   remote: Total 14 (delta 1), reused 13 (delta 0)
+   Unpacking objects: 100% (14/14), done.
+   Checking connectivity... done.
+   $ cd MainProject
+   $ ls -la
+   total 16
+   drwxr-xr-x   9 schacon  staff  306 Sep 17 15:21 .
+   drwxr-xr-x   7 schacon  staff  238 Sep 17 15:21 ..
+   drwxr-xr-x  13 schacon  staff  442 Sep 17 15:21 .git
+   -rw-r--r--   1 schacon  staff   92 Sep 17 15:21 .gitmodules
+   drwxr-xr-x   2 schacon  staff   68 Sep 17 15:21 DbConnector
+   -rw-r--r--   1 schacon  staff  756 Sep 17 15:21 Makefile
+   drwxr-xr-x   3 schacon  staff  102 Sep 17 15:21 includes
+   drwxr-xr-x   4 schacon  staff  136 Sep 17 15:21 scripts
+   drwxr-xr-x   4 schacon  staff  136 Sep 17 15:21 src
+   $ cd DbConnector/
+   $ ls
+   $
+
+* Klonowanie projektu z modułami zależnymi
+ $ git submodule init
+ Submodule 'rack' (git://github.com/chneukirchen/rack.git) registered for path 'rack'
+ $ git submodule update
+ Initialized empty Git repository in /opt/myproject/rack/.git/
+ remote: Counting objects: 3181, done.
+ remote: Compressing objects: 100% (1534/1534), done.
+ remote: Total 3181 (delta 1951), reused 2623 (delta 1603)
+ Receiving objects: 100% (3181/3181), 675.42 KiB | 173 KiB/s, done.
+ Resolving deltas: 100% (1951/1951), done.
+ Submodule path 'rack': checked out '08d709f78b8c5b0fbeb7821e37fa53e69afcf433'
+
+* git reset
+
+* git reset - trzy drzewa
+
+Drzewo - zbiór plików z określoną strukturą
+
+- HEAD - Ostatnio zatwierdzona migawka, rodzic dla kolejnej
+- Przechowalnia - Proponowana następna migawka
+- Katalog roboczy - Piaskownica
+
+* git reset
+Trzy drzewa - trzy stany zmiany
+.image images/07-git-tools/images/reset-workflow.png
+
+* git reset
+.image images/07-git-tools/images/reset-ex1.png 580 _
+
+* git reset
+.image images/07-git-tools/images/reset-ex2.png 580 _
+
+* git reset
+.image images/07-git-tools/images/reset-ex3.png 580 _
+
+* git reset
+.image images/07-git-tools/images/reset-ex4.png 580 _
+
+* git reset
+.image images/07-git-tools/images/reset-ex5.png 580 _
+
+* git reset
+.image images/07-git-tools/images/reset-ex6.png 580 _
+
+* git reset
+.image images/07-git-tools/images/reset-start.png 580 _
+
+* git reset
+.image images/07-git-tools/images/reset-soft.png 580 _
+
+* git reset
+.image images/07-git-tools/images/reset-mixed.png 580 _
+
+* git reset
+.image images/07-git-tools/images/reset-hard.png 580 _
+
+* git reset - podsumowanie
+
+Reset odbywa się w następujących krokach:
+
+- Przesuń aktualną gałąź (zakończ tu jeśli użyto --soft)
+
+- Ustaw stan poczekalni aby wyglądała jak HEAD (zakończ tu, chyba że użyto --hard)
+
+- Ustaw stan katalogu roboczego aby wyglądał jak poczekalnia
+
+
+
+* git reset ze ścieżką
+
+.image images/07-git-tools/images/reset-path1.png 580 _
+
+* git reset ze ścieżką
+
+.image images/07-git-tools/images/reset-path2.png 580 _
+
+* git reset ze ścieżką
+.image images/07-git-tools/images/reset-path3.png 580 _
+
+* git reset - łączenie zatwierdzeń zmian
+.image images/07-git-tools/images/reset-squash-r1.png 580 _
+
+* git reset - łączenie zatwierdzeń zmian
+.image images/07-git-tools/images/reset-squash-r2.png 580 _
+
+* git reset - łączenie zatwierdzeń zmian
+.image images/07-git-tools/images/reset-squash-r3.png 580 _
+
+* Rożnica między git reset i git checkout
+
+.image images/07-git-tools/images/reset-checkout.png 580 _
+
+
+* Inne systemy
+* Git i Subversion - pobranie repozytorium svn
+
+ $ git svn clone file:///tmp/test-svn -T trunk -b branches -t tags
+
+ Initialized empty Git repository in /Users/schacon/projects/testsvnsync/svn/.git/
+ r1 = b4e387bc68740b5af56c2a5faf4003ae42bd135c (trunk)
+      A    m4/acx_pthread.m4
+      A    m4/stl_hash.m4
+ ...
+ r75 = d1957f3b307922124eec6314e15bcda59e3d9610 (trunk)
+ Found possible branch point: file:///tmp/test-svn/trunk => \
+    file:///tmp/test-svn /branches/my-calc-branch, 75
+ Found branch parent: (my-calc-branch) d1957f3b307922124eec6314e15bcda59e3d9610
+ Following parent with do_switch
+ Successfully followed parent
+ r76 = 8624824ecc0badd73f40ea2f01fce51894189b01 (my-calc-branch)
+ Checked out HEAD:
+ file:///tmp/test-svn/branches/my-calc-branch r76
+
+* Git i Subversion - wgrywanie zmiian
+
+ $ git commit -am 'Adding git-svn instructions to the README'
+ [master 97031e5] Adding git-svn instructions to the README
+  1 files changed, 1 insertions(+), 1 deletions(-)
+
+
+ $ git svn dcommit
+ Committing to file:///tmp/test-svn/trunk ...
+         M      README.txt
+ Committed r79
+         M      README.txt
+ r79 = 938b1a547c2cc92033b74d32030e86468294a5c8 (trunk)
+ No changes between current HEAD and refs/remotes/trunk
+ Resetting to the latest refs/remotes/trunk
+
+* Git i Subversion - pobieranie zmian z serwera
+
+  $ git svn rebase
+        M      generate_descriptor_proto.sh
+  r82 = bd16df9173e424c6f52c337ab6efa7f7643282f1 (trunk)
+  First, rewinding head to replay your work on top of it...
+  Fast-forwarded master to refs/remotes/trunk
+
+* Ciekawe linki
+
+http://martinfowler.com/bliki/FeatureBranch.html
+http://martinfowler.com/bliki/BranchByAbstraction.html
+https://git-scm.com/book/pl/v1/
+https://git-scm.com/book/en/v2/
+https://www.atlassian.com/git/tutorials
+https://help.github.com/articles/good-resources-for-learning-git-and-github/
