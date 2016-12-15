@@ -5,18 +5,19 @@ Git
 
 
 .link #3 Wstęp
-.link #26 Podstawy
-.link #80 Gałęzie
-.link #132 Zdalne repozytorium
-.link #140 Narzędzia
-.link #161 Szczegóły git reset
-.link #183 Git i SVN
+.link #27 Podstawy
+.link #81 Gałęzie
+.link #133 Zdalne repozytorium
+.link #141 Narzędzia
+.link #162 Szczegóły git reset
+.link #184 Git i SVN
 
 
 * Wprowadzenie do kontroli wersji
 * Git
 .image images/avoid_conflicts_horizontal.jpg  _ 850
-
+* Git
+.image images/git_commit.png  _ 850
 * System lokalny
 .image images/01-introduction/images/local.png 550 _
 * System scentralizowany
