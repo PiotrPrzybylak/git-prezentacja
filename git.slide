@@ -366,7 +366,7 @@ Aby zobaczyć zmiany w poczekalni trzeba dodać opcję *--staged*.
 
 Zostanie uruchomiony wybrany przez ciebie edytor tekstu. Wybiera się go za pośrednictwem zmiennej środowiskową $EDITOR — zazwyczaj jest to vim lub emacs, możesz jednak wybrać własną aplikację używając polecenia
 
- $ git config --global core.editor.
+ $ git config --global core.editor [nazwa_edytora]
 
 Alternatywnie opis rewizji można podać już wydając polecenie commit, poprzedzając go flagą -m, jak poniżej:
 
@@ -1524,51 +1524,6 @@ Reset odbywa się w następujących krokach:
 * Rożnica między git reset i git checkout
 
 .image images/07-git-tools/images/reset-checkout.png 580 _
-
-
-* Inne systemy
-* Git i Subversion - pobranie repozytorium svn
-
- $ git svn clone file:///tmp/test-svn -T trunk -b branches -t tags
-
- Initialized empty Git repository in /Users/schacon/projects/testsvnsync/svn/.git/
- r1 = b4e387bc68740b5af56c2a5faf4003ae42bd135c (trunk)
-      A    m4/acx_pthread.m4
-      A    m4/stl_hash.m4
- ...
- r75 = d1957f3b307922124eec6314e15bcda59e3d9610 (trunk)
- Found possible branch point: file:///tmp/test-svn/trunk => \
-    file:///tmp/test-svn /branches/my-calc-branch, 75
- Found branch parent: (my-calc-branch) d1957f3b307922124eec6314e15bcda59e3d9610
- Following parent with do_switch
- Successfully followed parent
- r76 = 8624824ecc0badd73f40ea2f01fce51894189b01 (my-calc-branch)
- Checked out HEAD:
- file:///tmp/test-svn/branches/my-calc-branch r76
-
-* Git i Subversion - wgrywanie zmiian
-
- $ git commit -am 'Adding git-svn instructions to the README'
- [master 97031e5] Adding git-svn instructions to the README
-  1 files changed, 1 insertions(+), 1 deletions(-)
-
-
- $ git svn dcommit
- Committing to file:///tmp/test-svn/trunk ...
-         M      README.txt
- Committed r79
-         M      README.txt
- r79 = 938b1a547c2cc92033b74d32030e86468294a5c8 (trunk)
- No changes between current HEAD and refs/remotes/trunk
- Resetting to the latest refs/remotes/trunk
-
-* Git i Subversion - pobieranie zmian z serwera
-
-  $ git svn rebase
-        M      generate_descriptor_proto.sh
-  r82 = bd16df9173e424c6f52c337ab6efa7f7643282f1 (trunk)
-  First, rewinding head to replay your work on top of it...
-  Fast-forwarded master to refs/remotes/trunk
 
 * Ciekawe linki
 
