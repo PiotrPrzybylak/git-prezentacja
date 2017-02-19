@@ -170,7 +170,7 @@ Przy świeżo sklonowanym repozytorium:
  Your branch is up-to-date with 'origin/master'.
  nothing to commit, working directory clean
 
-Dodajny plik!
+Dodajmy plik!
 
  $ echo 'My Project' > README
  $ git status
